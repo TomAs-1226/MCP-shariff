@@ -1,0 +1,108 @@
+name: Auto Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      PACKAGE_NAME: '@baichen_yu/mcp-guard'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node + npm auth
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Verify npm token is configured
+        run: |
+          if [ -z "${NODE_AUTH_TOKEN}" ]; then
+            echo "NPM_TOKEN is missing. Add an npm Automation token in repo secrets." >&2
+            exit 1
+          fi
+
+      - name: Validate npm authentication
+        run: npm whoami
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate build and tests
+        run: |
+          npm run lint
+          npm test
+          npm run build
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Compute next version (always above npm latest)
+        id: next
+        shell: bash
+        run: |
+          latest_published=$(npm view "$PACKAGE_NAME" version 2>/dev/null || true)
+          local_version=$(node -p "require('./package.json').version")
+          if [ -z "$latest_published" ]; then
+            latest_published="0.0.0"
+          fi
+
+          next_version=$(node - "$local_version" "$latest_published" <<'NODE'
+const local = process.argv[2].split('.').map(Number);
+const published = process.argv[3].split('.').map(Number);
+const gt = (a, b) => (a[0] > b[0]) || (a[0] === b[0] && a[1] > b[1]) || (a[0] === b[0] && a[1] === b[1] && a[2] > b[2]);
+const base = gt(local, published) ? local : published;
+process.stdout.write(`${base[0]}.${base[1]}.${base[2] + 1}`);
+NODE
+)
+
+          echo "latest_published=$latest_published" >> "$GITHUB_OUTPUT"
+          echo "local_version=$local_version" >> "$GITHUB_OUTPUT"
+          echo "new_version=$next_version" >> "$GITHUB_OUTPUT"
+
+      - name: Bump version and create tag
+        run: npm version "${{ steps.next.outputs.new_version }}" -m "chore(release): %s [skip ci]"
+
+      - name: Push version commit and tag
+        run: |
+          git push
+          git push --tags
+
+      - name: Build release assets
+        run: |
+          mkdir -p release-artifacts
+          npm pack --pack-destination release-artifacts
+          tar -czf "release-artifacts/dist-v${{ steps.next.outputs.new_version }}.tar.gz" dist
+          cp -f README.md LICENSE release-artifacts/
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+
+      - name: Create or update GitHub release with generated notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ steps.next.outputs.new_version }}"
+          TITLE="$TAG"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" release-artifacts/* --clobber
+            gh release edit "$TAG" --title "$TITLE" --generate-notes
+          else
+            gh release create "$TAG" release-artifacts/* --title "$TITLE" --generate-notes
+          fi
