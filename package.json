@@ -1,10 +1,10 @@
 {
-  "name": "mcp-doctor",
-  "version": "0.1.0",
+  "name": "mcp-guard",
+  "version": "0.3.0",
   "description": "Validate, test, and security-audit MCP servers and tool schemas",
   "type": "module",
   "bin": {
-    "mcp-doctor": "dist/cli.js"
+    "mcp-guard": "dist/cli.js"
   },
   "engines": {
     "node": ">=20"

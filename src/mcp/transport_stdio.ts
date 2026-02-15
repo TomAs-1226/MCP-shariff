@@ -11,15 +11,19 @@ export class StdioTransport {
     if (this.proc) {
       throw new Error('Transport already started');
     }
+    if (!config.stdioCommand) {
+      throw new Error('stdioCommand is required for StdioTransport');
+    }
     const env = { ...process.env, ...(config.env ?? {}) };
-    this.proc = spawn(config.stdioCommand, {
+    const proc = spawn(config.stdioCommand, {
       cwd: config.cwd,
       env,
       shell: true,
       stdio: ['pipe', 'pipe', 'pipe']
     });
+    this.proc = proc;
 
-    this.proc.stdout.on('data', (chunk: Buffer) => {
+    proc.stdout.on('data', (chunk: Buffer) => {
       this.buffer += chunk.toString('utf8');
       let idx = this.buffer.indexOf('\n');
       while (idx >= 0) {
@@ -32,7 +36,7 @@ export class StdioTransport {
       }
     });
 
-    this.proc.stderr.on('data', (chunk) => {
+    proc.stderr.on('data', (chunk) => {
       const message = chunk.toString('utf8').trim();
       if (message.length > 0) {
         // eslint-disable-next-line no-console
@@ -40,14 +44,14 @@ export class StdioTransport {
       }
     });
 
-    this.proc.once('exit', (code, signal) => {
+    proc.once('exit', (code, signal) => {
       if (code !== 0 && signal !== 'SIGTERM') {
         // eslint-disable-next-line no-console
         console.error(`Server exited unexpectedly (code=${code}, signal=${signal})`);
       }
     });
 
-    await once(this.proc, 'spawn');
+    await once(proc, 'spawn');
   }
 
   onLine(cb: (line: string) => void): void {

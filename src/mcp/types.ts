@@ -34,7 +34,8 @@ export interface ToolDescriptor {
 }
 
 export interface ServerConfig {
-  stdioCommand: string;
+  stdioCommand?: string;
+  httpUrl?: string;
   cwd?: string;
   env?: Record<string, string>;
   timeoutMs?: number;
@@ -54,18 +55,21 @@ export interface Finding {
 export interface TestResult {
   name: string;
   passed: boolean;
+  durationMs: number;
   details?: string;
 }
 
 export interface Report {
   server: {
-    command: string;
+    target: string;
+    transport: 'stdio' | 'http';
     protocolVersion?: string;
   };
   tools: ToolDescriptor[];
   findings: Finding[];
   tests: TestResult[];
   score: number;
+  scoreBreakdown: string[];
   generatedAt: string;
 }
 
@@ -74,3 +78,11 @@ export interface NormalizedError {
   message: string;
   data?: unknown;
 }
+
+export interface RpcClient {
+  request<T>(method: string, params?: unknown, timeoutOverrideMs?: number): Promise<T>;
+  normalizeError(error: unknown): NormalizedError;
+  close(): Promise<void>;
+}
+
+export type Profile = 'default' | 'strict' | 'paranoid';

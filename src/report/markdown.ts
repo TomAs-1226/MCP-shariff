@@ -2,20 +2,26 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { Report } from '../mcp/types.js';
 
-export async function writeMarkdownReport(report: Report, outDir: string): Promise<string> {
+export async function writeMarkdownReport(report: Report, outDir: string, fileName = 'report.md'): Promise<string> {
   await mkdir(outDir, { recursive: true });
-  const output = join(outDir, 'report.md');
+  const output = join(outDir, fileName);
+
+  const passedTests = report.tests.filter((t) => t.passed).length;
+  const passRate = report.tests.length === 0 ? 'n/a' : `${passedTests}/${report.tests.length}`;
 
   const lines: string[] = [];
-  lines.push(`# MCP Doctor Report`);
+  lines.push('# MCP Guard Report');
   lines.push('');
-  lines.push(`- Generated: ${report.generatedAt}`);
-  lines.push(`- Command: \`${report.server.command}\``);
-  lines.push(`- Protocol version: ${report.server.protocolVersion ?? 'unknown'}`);
-  lines.push(`- Risk score: **${report.score}/100**`);
+  lines.push('## Summary');
+  lines.push('');
+  lines.push(`- **Risk score:** ${report.score}/100`);
+  lines.push(`- **Key findings:** ${report.findings.length}`);
+  lines.push(`- **Contract tests:** ${passRate}`);
+  lines.push(`- **Generated:** ${report.generatedAt}`);
+  lines.push(`- **Target:** \`${report.server.target}\` (${report.server.transport})`);
   lines.push('');
 
-  lines.push('## Tools');
+  lines.push('## Tool Inventory');
   lines.push('');
   lines.push('| Name | Description |');
   lines.push('| --- | --- |');
@@ -24,23 +30,37 @@ export async function writeMarkdownReport(report: Report, outDir: string): Promi
   }
   lines.push('');
 
-  lines.push('## Findings');
+  lines.push('## Findings by Severity');
   lines.push('');
-  if (report.findings.length === 0) {
-    lines.push('- No findings');
-  } else {
-    for (const finding of report.findings) {
-      lines.push(`- **${finding.severity.toUpperCase()}** ${finding.ruleId}: ${finding.message}`);
-      lines.push(`  - Evidence: \`${finding.evidence}\``);
-      lines.push(`  - Remediation: ${finding.remediation}`);
+  for (const severity of ['high', 'medium', 'low'] as const) {
+    const group = report.findings.filter((finding) => finding.severity === severity);
+    lines.push(`### ${severity.toUpperCase()} (${group.length})`);
+    if (group.length === 0) {
+      lines.push('- None');
+    } else {
+      for (const finding of group) {
+        lines.push(`- **${finding.ruleId}**: ${finding.message}`);
+        lines.push(`  - Remediation: ${finding.remediation}`);
+      }
     }
+    lines.push('');
   }
 
-  lines.push('');
-  lines.push('## Contract Tests');
+  lines.push('## Contract Test Results');
   lines.push('');
   for (const test of report.tests) {
-    lines.push(`- ${test.passed ? '✅' : '❌'} ${test.name}: ${test.details ?? ''}`);
+    lines.push(`- ${test.passed ? '✅' : '❌'} ${test.name} (${test.durationMs} ms): ${test.details ?? ''}`);
+  }
+  lines.push('');
+
+  lines.push('## Explain Score');
+  lines.push('');
+  if (report.scoreBreakdown.length === 0) {
+    lines.push('- No penalties applied.');
+  } else {
+    for (const item of report.scoreBreakdown) {
+      lines.push(`- ${item}`);
+    }
   }
 
   await writeFile(output, `${lines.join('\n')}\n`, 'utf8');

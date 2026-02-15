@@ -15,7 +15,7 @@ export async function writeSarif(findings: Finding[], outputFile: string): Promi
       {
         tool: {
           driver: {
-            name: 'mcp-doctor',
+            name: 'mcp-guard',
             rules: findings.map((finding) => ({
               id: finding.ruleId,
               shortDescription: { text: finding.message }

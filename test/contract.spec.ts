@@ -1,17 +1,20 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { JsonRpcClient } from '../src/mcp/jsonrpc.js';
+import { StdioJsonRpcClient } from '../src/mcp/jsonrpc.js';
 import { StdioTransport } from '../src/mcp/transport_stdio.js';
 import { runCallToolTest } from '../src/tests/contract/call_tool.js';
+import { runCancellationTest } from '../src/tests/contract/cancellation.js';
 import { runErrorShapesTest } from '../src/tests/contract/error_shapes.js';
+import { runLargePayloadTest } from '../src/tests/contract/large_payload.js';
 import { runListToolsTest } from '../src/tests/contract/list_tools.js';
+import { runTimeoutTest } from '../src/tests/contract/timeout.js';
 
 describe('contract suite', () => {
   const transport = new StdioTransport();
-  let client: JsonRpcClient;
+  let client: StdioJsonRpcClient;
 
   beforeEach(async () => {
     await transport.start({ stdioCommand: 'node fixtures/servers/hello-mcp-server/server.cjs' });
-    client = new JsonRpcClient(transport, 2000);
+    client = new StdioJsonRpcClient(transport, 2000);
     await client.request('initialize', { clientInfo: { name: 'contract', version: '0.1.0' } });
   });
 
@@ -31,6 +34,21 @@ describe('contract suite', () => {
 
   it('checks error shapes', async () => {
     const result = await runErrorShapesTest(client);
+    expect(result.passed).toBe(true);
+  });
+
+  it('accepts cancellation not supported behavior', async () => {
+    const result = await runCancellationTest(client);
+    expect(result.passed).toBe(true);
+  });
+
+  it('handles large payloads safely', async () => {
+    const result = await runLargePayloadTest(client);
+    expect(result.passed).toBe(true);
+  });
+
+  it('enforces deterministic timeouts', async () => {
+    const result = await runTimeoutTest(client);
     expect(result.passed).toBe(true);
   });
 });

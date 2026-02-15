@@ -19,9 +19,20 @@ const tools = [
     inputSchema: {
       type: 'object',
       properties: {
-        text: { type: 'string', maxLength: 500 }
+        text: { type: 'string', maxLength: 50000 }
       },
       required: ['text']
+    }
+  },
+  {
+    name: 'sleep',
+    description: 'Sleeps for a bounded number of milliseconds',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        ms: { type: 'number', minimum: 0, maximum: 2000 }
+      },
+      required: ['ms']
     }
   }
 ];
@@ -35,7 +46,7 @@ function respondError(id, code, message, data) {
 }
 
 const rl = readline.createInterface({ input: process.stdin, crlfDelay: Infinity });
-rl.on('line', (line) => {
+rl.on('line', async (line) => {
   let request;
   try {
     request = JSON.parse(line);
@@ -46,11 +57,15 @@ rl.on('line', (line) => {
   const { id, method, params } = request;
 
   if (method === 'initialize') {
-    return respond(id, { protocolVersion: '2025-03-26', serverInfo: { name: 'hello-mcp-server', version: '0.1.0' } });
+    return respond(id, { protocolVersion: '2025-03-26', serverInfo: { name: 'hello-mcp-server', version: '0.3.0' } });
   }
 
   if (method === 'tools/list') {
     return respond(id, { tools });
+  }
+
+  if (method === 'tools/cancel') {
+    return respondError(id, -32601, 'Cancellation not supported');
   }
 
   if (method === 'tools/call') {
@@ -67,6 +82,14 @@ rl.on('line', (line) => {
         return respondError(id, -32602, 'Invalid params', { field: 'text', expected: 'string' });
       }
       return respond(id, { content: args.text });
+    }
+    if (name === 'sleep') {
+      const duration = Number(args.ms);
+      if (!Number.isFinite(duration)) {
+        return respondError(id, -32602, 'Invalid params', { field: 'ms', expected: 'number' });
+      }
+      await new Promise((resolve) => setTimeout(resolve, duration));
+      return respond(id, { content: `Slept ${duration}ms` });
     }
     return respondError(id, -32601, `Unknown tool: ${name}`);
   }

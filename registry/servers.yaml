@@ -5,4 +5,6 @@ servers:
     install: npm install
     run: node fixtures/servers/hello-mcp-server/server.cjs
     tags: [demo, testing]
+    permissions: [network:none, filesystem:read]
+    riskNotes: "Demo server only; no external side effects"
     securityNotes: "No external side effects; demo-only"

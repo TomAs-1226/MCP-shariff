@@ -1,7 +1,7 @@
-import { JsonRpcClient } from '../../mcp/jsonrpc.js';
-import { TestResult } from '../../mcp/types.js';
+import { RpcClient, TestResult } from '../../mcp/types.js';
 
-export async function runErrorShapesTest(client: JsonRpcClient): Promise<TestResult> {
+export async function runErrorShapesTest(client: RpcClient): Promise<TestResult> {
+  const start = Date.now();
   try {
     await client.request('tools/call', {
       name: 'hello',
@@ -10,6 +10,7 @@ export async function runErrorShapesTest(client: JsonRpcClient): Promise<TestRes
     return {
       name: 'error_shapes',
       passed: false,
+      durationMs: Date.now() - start,
       details: 'Expected an error but call succeeded'
     };
   } catch (error) {
@@ -18,6 +19,7 @@ export async function runErrorShapesTest(client: JsonRpcClient): Promise<TestRes
     return {
       name: 'error_shapes',
       passed,
+      durationMs: Date.now() - start,
       details: JSON.stringify(normalized)
     };
   }

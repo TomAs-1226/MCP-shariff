@@ -1,12 +1,6 @@
-import { Finding } from '../mcp/types.js';
+import { Finding, Profile } from '../mcp/types.js';
+import { scoreFindings } from './profiles.js';
 
-const severityPenalty: Record<Finding['severity'], number> = {
-  low: 5,
-  medium: 12,
-  high: 25
-};
-
-export function computeRiskScore(findings: Finding[]): number {
-  const penalty = findings.reduce((acc, f) => acc + severityPenalty[f.severity], 0);
-  return Math.max(0, 100 - penalty);
+export function computeRiskScore(findings: Finding[], profile: Profile): { score: number; breakdown: string[] } {
+  return scoreFindings(findings, profile);
 }

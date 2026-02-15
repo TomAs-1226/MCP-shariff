@@ -1,4 +1,4 @@
-name: Nightly Registry Checks
+name: mcp-guard Nightly Registry Checks
 
 on:
   schedule:
@@ -15,4 +15,5 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run dev -- registry lint registry/servers.yaml
+      - run: npm run dev -- registry verify registry/servers.yaml --sample 5
       - run: npm run dev -- registry score registry/servers.yaml
