@@ -20,7 +20,9 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "prepublishOnly": "npm run lint && npm test"
+    "prepublishOnly": "npm run lint && npm test",
+    "release:offline": "bash scripts/build-release-local.sh",
+    "npm:test-run": "PKG=$(npm pack --silent | tail -n 1) && npx --yes --package \"./$PKG\" mcp-guard --help && rm -f \"$PKG\""
   },
   "dependencies": {
     "commander": "^12.1.0",
@@ -44,11 +46,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/TomAs-1226/MCP-shariff.git"
+    "url": "https://github.com/TomAs-1226/mcp-guard.git"
   },
-  "homepage": "https://tomas-1226.github.io/MCP-shariff/",
+  "homepage": "https://tomas-1226.github.io/mcp-guard/",
   "bugs": {
-    "url": "https://github.com/TomAs-1226/MCP-shariff/issues"
+    "url": "https://github.com/TomAs-1226/mcp-guard/issues"
   },
   "publishConfig": {
     "access": "public"

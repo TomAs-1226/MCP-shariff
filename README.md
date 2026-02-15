@@ -18,7 +18,7 @@ Deterministic checks. Actionable findings. Reproducible reports.
 ---
 
 > [!IMPORTANT]
-> Remote mode supports **HTTP JSON-RPC only** (`--http`). SSE is not implemented yet.
+> Remote mode supports **HTTP JSON-RPC** (`--http`) and **SSE** (`--sse`, optional `--sse-post`).
 
 ## Why people use mcp-guard
 
@@ -32,7 +32,7 @@ Deterministic checks. Actionable findings. Reproducible reports.
 
 | Signal | Value |
 |---|---:|
-| Transports | STDIO + HTTP JSON-RPC |
+| Transports | STDIO + HTTP JSON-RPC + SSE |
 | Report formats | Markdown, JSON, SARIF |
 | Rule profiles | 3 |
 | Contract scenarios | list, call, error shape, cancellation behavior, large payload, timeout |
@@ -83,7 +83,7 @@ mcp-guard --help
 
 ```mermaid
 flowchart LR
-  CLI[mcp-guard CLI] --> T[Transport layer\nSTDIO or HTTP]
+  CLI[mcp-guard CLI] --> T[Transport layer\nSTDIO HTTP SSE]
   T --> RPC[JSON-RPC client]
   RPC --> TESTS[Contract tests]
   RPC --> RULES[Rules and profiles]
@@ -130,8 +130,11 @@ mcp-guard validate --stdio "node server.cjs" --profile default --out reports
 mcp-guard test --stdio "node server.cjs" --out reports
 mcp-guard audit --stdio "node server.cjs" --profile strict --fail-on medium --sarif reports/report.sarif
 
-# Remote audit (HTTP JSON-RPC only)
+# Remote audit (HTTP JSON-RPC)
 mcp-guard audit --http "http://127.0.0.1:4010" --timeout-ms 30000 --fail-on off
+
+# Remote audit (SSE stream + POST endpoint)
+mcp-guard audit --sse "http://127.0.0.1:4013/sse" --sse-post "http://127.0.0.1:4013/message" --timeout-ms 30000 --fail-on off
 
 # Config scan
 mcp-guard scan --repo . --format md --out reports
@@ -166,6 +169,16 @@ jobs:
 ```
 
 ---
+
+## Automated releases
+
+- On each push to `main`, `.github/workflows/release.yml` now:
+  - runs lint/test/build
+  - computes the next available version above local and npm latest
+  - builds release assets (package tarball + compiled `dist` archive)
+  - creates/updates a GitHub Release with GitHub generated (auto/AI-style) release notes + uploaded assets
+  - publishes the new package to npm (requires `NPM_TOKEN`)
+- For npm publishing in CI, set `NPM_TOKEN` to an **npm Automation token** (no interactive password/OTP required).
 
 ## Docs site (GitHub Pages)
 
@@ -202,10 +215,10 @@ Wrap `--stdio` values in double quotes.
 
 ## Release helper
 
-Build release artifacts locally:
+Build release artifacts locally/offline (after one online `npm ci`):
 
 ```bash
-./scripts/build-release-local.sh
+npm run release:offline
 ```
 
 ---
@@ -219,3 +232,10 @@ Build release artifacts locally:
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+
+### npm package run check
+
+```bash
+npm run npm:test-run
+```
