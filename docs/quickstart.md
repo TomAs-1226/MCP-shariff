@@ -3,14 +3,24 @@
 ## No install (npx)
 
 ```bash
-npx @CHANGE_ME/mcp-guard audit --stdio "node fixtures/servers/hello-mcp-server/server.cjs" --out reports --fail-on off
+npx @baichen_yu/mcp-guard audit --stdio "node fixtures/servers/hello-mcp-server/server.cjs" --out reports --fail-on off
 ```
 
 ## Global install
 
 ```bash
-npm i -g @CHANGE_ME/mcp-guard
+npm i -g @baichen_yu/mcp-guard
 mcp-guard --help
+```
+
+## Package note
+
+The npm package is scoped as `@baichen_yu/mcp-guard` to avoid name collisions, while the runtime CLI command stays `mcp-guard`.
+
+For first publish of the scoped package, use:
+
+```bash
+npm publish --access public
 ```
 
 ## GitHub Pages docs

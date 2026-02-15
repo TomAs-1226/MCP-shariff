@@ -1,5 +1,5 @@
 {
-  "name": "@CHANGE_ME/mcp-guard",
+  "name": "@baichen_yu/mcp-guard",
   "version": "0.3.0",
   "description": "Security auditing and policy gating for MCP servers (STDIO/HTTP) with Markdown + SARIF reports",
   "type": "module",
@@ -41,11 +41,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/CHANGE_ME/MCP-doctor.git"
+    "url": "https://github.com/baichen_yu/MCP-doctor.git"
   },
-  "homepage": "https://CHANGE_ME.github.io/MCP-doctor/",
+  "homepage": "https://baichen_yu.github.io/MCP-doctor/",
   "bugs": {
-    "url": "https://github.com/CHANGE_ME/MCP-doctor/issues"
+    "url": "https://github.com/baichen_yu/MCP-doctor/issues"
   },
   "publishConfig": {
     "access": "public"
@@ -60,6 +60,5 @@
     "sarif",
     "cli",
     "lint"
-  ],
-  "scopeTodo": "TODO: replace CHANGE_ME with your npm scope before publish."
+  ]
 }

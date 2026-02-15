@@ -3,9 +3,9 @@
 ## Install
 
 ```bash
-npm i -g @CHANGE_ME/mcp-guard
+npm i -g @baichen_yu/mcp-guard
 # or
-npx @CHANGE_ME/mcp-guard --help
+npx @baichen_yu/mcp-guard --help
 ```
 
 Installed command remains:

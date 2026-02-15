@@ -1,7 +1,7 @@
 # mcp-guard
 
-[![CI](https://img.shields.io/github/actions/workflow/status/CHANGE_ME/MCP-doctor/ci.yml?label=CI)](./.github/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/%40CHANGE_ME%2Fmcp-guard)](https://www.npmjs.com/package/@CHANGE_ME/mcp-guard)
+[![CI](https://img.shields.io/github/actions/workflow/status/baichen_yu/MCP-doctor/ci.yml?label=CI)](./.github/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/%40baichen_yu%2Fmcp-guard)](https://www.npmjs.com/package/@baichen_yu/mcp-guard)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 Security auditing and policy gating for MCP servers (local + CI), with deterministic tests and Markdown/SARIF outputs.
@@ -13,7 +13,7 @@ Security auditing and policy gating for MCP servers (local + CI), with determini
 
 ## Package name
 
-- npm package: `@CHANGE_ME/mcp-guard` (scoped to avoid name collisions)
+- npm package: `@baichen_yu/mcp-guard` (scoped to avoid name collisions)
 - CLI command after install: `mcp-guard`
 - first scoped publish: `npm publish --access public`
 
@@ -22,13 +22,13 @@ Security auditing and policy gating for MCP servers (local + CI), with determini
 ### A) No install (npx)
 
 ```bash
-npx @CHANGE_ME/mcp-guard audit --stdio "node fixtures/servers/hello-mcp-server/server.cjs" --out reports --fail-on off
+npx @baichen_yu/mcp-guard audit --stdio "node fixtures/servers/hello-mcp-server/server.cjs" --out reports --fail-on off
 ```
 
 ### B) Global install
 
 ```bash
-npm i -g @CHANGE_ME/mcp-guard
+npm i -g @baichen_yu/mcp-guard
 mcp-guard --help
 ```
 
@@ -96,9 +96,9 @@ mcp-guard registry score registry/servers.yaml
 
 ## Links
 
-- Docs: https://CHANGE_ME.github.io/MCP-doctor/
-- GitHub: https://github.com/CHANGE_ME/MCP-doctor
-- npm: https://www.npmjs.com/package/@CHANGE_ME/mcp-guard
+- Docs: https://baichen_yu.github.io/MCP-doctor/
+- GitHub: https://github.com/baichen_yu/MCP-doctor
+- npm: https://www.npmjs.com/package/@baichen_yu/mcp-guard
 
 ## Troubleshooting
 
@@ -110,6 +110,11 @@ mcp-guard registry score registry/servers.yaml
 ## Releasing
 
 See [`docs/releasing.md`](docs/releasing.md) and [`RELEASE.md`](RELEASE.md).
+
+### Publishing troubleshooting
+
+Run `npm publish` from the project root that contains `package.json`.
+If you hit `ENOENT` for `package.json`, you are publishing from the wrong directory.
 
 ## License
 

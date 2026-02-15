@@ -21,8 +21,8 @@ export default defineConfig({
       { text: 'Rules', link: '/rules' },
       { text: 'Security Model', link: '/security-model' },
       { text: 'GitHub Action', link: '/github-action' },
-      { text: 'GitHub', link: 'https://github.com/CHANGE_ME/MCP-doctor' },
-      { text: 'npm', link: 'https://www.npmjs.com/package/@CHANGE_ME/mcp-guard' }
+      { text: 'GitHub', link: 'https://github.com/baichen_yu/MCP-doctor' },
+      { text: 'npm', link: 'https://www.npmjs.com/package/@baichen_yu/mcp-guard' }
     ],
     sidebar: [
       {
@@ -48,7 +48,7 @@ export default defineConfig({
         ]
       }
     ],
-    socialLinks: [{ icon: 'github', link: 'https://github.com/CHANGE_ME/MCP-doctor' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/baichen_yu/MCP-doctor' }],
     search: {
       provider: 'local'
     },

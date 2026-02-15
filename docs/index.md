@@ -37,6 +37,12 @@ features:
 > [!IMPORTANT]
 > Remote mode currently supports **HTTP JSON-RPC only** (`--http`). SSE is not implemented.
 
+<div class="stats-grid">
+  <div class="stat-card"><h4>Profiles</h4><p><code>default</code> · <code>strict</code> · <code>paranoid</code></p></div>
+  <div class="stat-card"><h4>Outputs</h4><p><code>report.md</code> · <code>report.json</code> · <code>report.sarif</code></p></div>
+  <div class="stat-card"><h4>Policy</h4><p><code>--fail-on off|low|medium|high</code></p></div>
+</div>
+
 ## Report preview
 
 <div class="report-preview">
@@ -59,5 +65,11 @@ graph LR
   GATE --> CI[CI / Code Scanning]
 ```
 
-- GitHub: https://github.com/CHANGE_ME/MCP-doctor
-- npm: https://www.npmjs.com/package/@CHANGE_ME/mcp-guard
+## Ship checklist
+
+1. Run `mcp-guard audit` in CI with `--fail-on` policy.
+2. Upload SARIF so findings show in security dashboards.
+3. Gate merges on reproducible report output.
+
+- GitHub: https://github.com/baichen_yu/MCP-doctor
+- npm: https://www.npmjs.com/package/@baichen_yu/mcp-guard
